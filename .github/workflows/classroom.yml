@@ -1,0 +1,31 @@
+name: Autograding Tests
+on:
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs: 
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run Autograding Tests
+      uses: classroom-resources/autograding-io-grader@v1
+      id: run-tests
+      with:
+        test-name: 'Test Name'
+        setup-command: |
+          echo "Setup step"
+        command: 'echo hello'
+        expected-output: 'hello'
+        comparison-method: 'exact'
+        max-score: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        RUN-TESTS_RESULTS: "${{ steps.run-tests.outputs.result }}"
+      with:
+        runners: "run-tests"
